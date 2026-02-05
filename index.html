@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛博朋克未来视界 v3.0 | Cyberpunk Interactive</title>
+    <style>
+        /* ==================== 基础设置 ==================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-yellow: #ffff00;
+            --neon-purple: #bf00ff;
+            --neon-orange: #ff6b35;
+            --neon-green: #00ff88;
+            --neon-red: #ff3366;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(15, 15, 25, 0.95);
+            --grid-color: rgba(0, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            cursor: crosshair;
+        }
+
+        /* ==================== 背景特效 ==================== */
+        
+        /* 动态网格背景 */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 30s linear infinite;
+            z-index: -3;
+            pointer-events: none;
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: center top;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+        }
+
+        /* 代码雨背景 */
+        .code-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.15;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: var(--neon-green);
+            overflow: hidden;
+        }
+
+        .code-column {
+            position: absolute;
+            top: -100%;
+            white-space: pre;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            animation: codeFall linear infinite;
+        }
+
+        @keyframes codeFall {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        /* 全息背景效果 */
+        .holo-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(191, 0, 255, 0.1) 0%, transparent 70%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* 扫描线效果 */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.6;
+        }
+
+        /* 鼠标光标拖尾 */
+        .cursor-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 0 10px var(--neon-cyan), inset 0 0 10px var(--neon-cyan);
+        }
+
+        .cursor-trail.active {
+            width: 50px;
+            height: 50px;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px var(--neon-pink);
+        }
+
+        .cursor-dot {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px var(--neon-cyan);
+        }
+
+        /* 浮动粒子 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            animation: particleFloat 15s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ==================== 容器布局 ==================== */
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* ==================== 头部设计 ==================== */
+        
+        header {
+            text-align: center;
+            padding: 60px 0 80px;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), var(--neon-cyan), transparent);
+            animation: headerScan 4s ease-in-out infinite;
+        }
+
+        @keyframes headerScan {
+            0%, 100% { opacity: 0.3; width: 100px; }
+            50% { opacity: 1; width: 300px; }
+        }
+
+        /* 主标题 */
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .main-title .inner {
+            background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 50%, var(--neon-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-title .glitch-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+        }
+
+        .main-title .glitch-layer:nth-child(1) {
+            color: var(--neon-cyan);
+            transform: translate(-2px, -2px);
+            animation: glitch1 3s infinite linear alternate-reverse;
+        }
+
+        .main-title .glitch-layer:nth-child(2) {
+            color: var(--neon-pink);
+            transform: translate(2px, 2px);
+            animation: glitch2 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch1 {
+            0%, 100% { clip-path: inset(20% 0 60% 0); }
+            20% { clip-path: inset(10% 0 70% 0); }
+            40% { clip-path: inset(50% 0 20% 0); }
+            60% { clip-path: inset(30% 0 40% 0); }
+            80% { clip-path: inset(70% 0 10% 0); }
+        }
+
+        @keyframes glitch2 {
+            0%, 100% { clip-path: inset(60% 0 20% 0); }
+            20% { clip-path: inset(40% 0 50% 0); }
+            40% { clip-path: inset(10% 0 70% 0); }
+            60% { clip-path: inset(70% 0 10% 0); }
+            80% { clip-path: inset(30% 0 40% 0); }
+        }
+
+        /* 副标题 */
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--neon-cyan);
+            letter-spacing: 6px;
+            margin-top: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        /* 装饰线 */
+        .title-decoration {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .title-line {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+            position: relative;
+        }
+
+        .title-line::before,
+        .title-line::after {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 8px;
+            color: var(--neon-pink);
+        }
+
+        .title-line::before { left: -10px; }
+        .title-line::after { right: -10px; }
+
+        .title-icon {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            animation: iconPulse 2s ease infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* 系统状态栏 */
+        .system-status {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 5px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            animation: statusPulse 2s ease infinite;
+        }
+
+        .status-dot.green {
+            background: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .status-dot.cyan {
+            background: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .status-dot.pink {
+            background: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 进度条 */
+        .data-loader {
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .loader-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+        }
+
+        .loader-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+            background-size: 200% 100%;
+            animation: loaderMove 2s linear infinite, loaderGlow 1.5s ease infinite alternate;
+            border-radius: 2px;
+        }
+
+        @keyframes loaderMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        @keyframes loaderGlow {
+            0% { box-shadow: 0 0 5px var(--neon-cyan); }
+            100% { box-shadow: 0 0 20px var(--neon-pink); }
+        }
+
+        /* ==================== 新增互动区域 ==================== */
+        
+        /* 交互式终端 */
+        .terminal-section {
+            margin: 60px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .terminal {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .terminal-header {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.2), transparent);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .terminal-title {
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .terminal-btn.red { background: #ff5f56; }
+        .terminal-btn.yellow { background: #ffbd2e; }
+        .terminal-btn.green { background: #27ca40; }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .terminal-line.input {
+            color: var(--neon-green);
+        }
+
+        .terminal-line.output {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .terminal-line.error {
+            color: var(--neon-red);
+        }
+
+        .terminal-line.success {
+            color: var(--neon-cyan);
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .terminal-prompt {
+            color: var(--neon-green);
+            margin-right: 10px;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .terminal-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 黑客入侵小游戏 */
+        .hacking-section {
+            margin: 60px 0;
+        }
+
+        .hacking-game {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--neon-pink);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+
+        .game-header {
+            background: linear-gradient(90deg, rgba(255, 0, 255, 0.2), transparent);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 0, 255, 0.3);
+        }
+
+        .game-title {
+            color: var(--neon-pink);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .game-stat {
+            text-align: center;
+        }
+
+        .game-stat-value {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .game-stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.7rem;
+        }
+
+        .game-area {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .hacking-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .hack-node {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hack-node.active {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .hack-node.completed {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--neon-green);
+        }
+
+        .hack-node.current {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 255, 0.2);
+            box-shadow: 0 0 15px var(--neon-pink);
+            color: var(--neon-pink);
+            animation: nodePulse 1s ease infinite;
+        }
+
+        @keyframes nodePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .hack-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hack-code {
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            letter-spacing: 10px;
+            margin-bottom: 15px;
+        }
+
+        .hack-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .hack-btn {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .hack-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .hack-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .game-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            display: none;
+        }
+
+        .game-message.win {
+            display: block;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .game-message.lose {
+            display: block;
+            background: rgba(255, 51, 102, 0.2);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        /* 成就系统 */
+        .achievements-section {
+            margin: 60px 0;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .achievement {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .achievement.locked {
+            opacity: 0.5;
+        }
+
+        .achievement.unlocked {
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .achievement-name {
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .achievement-desc {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .achievement-lock {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 霓虹主题选择器 */
+        .theme-section {
+            margin: 60px 0;
+            text-align: center;
+        }
+
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .theme-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-color: #fff;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .theme-btn::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+        }
+
+        .theme-btn.cyan {
+            background: linear-gradient(135deg, #00ffff, #008888);
+            color: #00ffff;
+        }
+
+        .theme-btn.pink {
+            background: linear-gradient(135deg, #ff00ff, #880088);
+            color: #ff00ff;
+        }
+
+        .theme-btn.green {
+            background: linear-gradient(135deg, #00ff88, #008844);
+            color: #00ff88;
+        }
+
+        .theme-btn.purple {
+            background: linear-gradient(135deg, #bf00ff, #5f0088);
+            color: #bf00ff;
+        }
+
+        .theme-btn.orange {
+            background: linear-gradient(135deg, #ff6b35, #88351a);
+            color: #ff6b35;
+        }
+
+        /* 音乐播放器 */
+        .music-section {
+            margin: 60px 0;
+        }
+
+        .music-player {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-purple);
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(191, 0, 255, 0.2);
+        }
+
+        .music-visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 5px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .viz-bar {
+            width: 8px;
+            background: linear-gradient(to top, var(--neon-purple), var(--neon-cyan));
+            border-radius: 4px;
+            animation: vizBounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes vizBounce {
+            0% { height: 10px; }
+            100% { height: 60px; }
+        }
+
+        .music-info {
+            margin-bottom: 20px;
+        }
+
+        .music-title {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .music-artist {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .music-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .music-btn.play {
+            width: 60px;
+            height: 60px;
+            background: var(--neon-cyan);
+            color: #000;
+        }
+
+        .music-btn.play:hover {
+            background: #fff;
+        }
+
+        /* ==================== 视频区域 ==================== */
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::before,
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan));
+        }
+
+        .section-title h2::before { left: -70px; }
+        .section-title h2::after { 
+            right: -70px; 
+            background: linear-gradient(90deg, var(--neon-cyan), transparent);
+        }
+
+        .video-section {
+            margin: 60px 0;
+        }
+
+        .video-wrapper-outer {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, 
+                rgba(191, 0, 255, 0.1) 0%, 
+                rgba(0, 255, 255, 0.1) 50%, 
+                rgba(255, 0, 255, 0.1) 100%);
+            border-radius: 10px;
+        }
+
+        .video-frame {
+            position: relative;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.2),
+                inset 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(180deg, rgba(0, 255, 255, 0.2), transparent);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .video-frame::after {
+            content: '▶ NOW PLAYING';
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.7rem;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            z-index: 10;
+            animation: blink 1s ease infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .video-aspect {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-aspect iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ==================== 信息卡片区域 ==================== */
+        
+        .cards-section {
+            margin: 80px 0;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .cyber-card {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .card-header {
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--neon-cyan), 
+                var(--neon-pink), 
+                var(--neon-purple), 
+                var(--neon-cyan));
+            background-size: 300% 100%;
+            animation: headerGradient 5s ease infinite;
+        }
+
+        @keyframes headerGradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 0%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .card-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(135deg, 
+                rgba(0, 255, 255, 0.3), 
+                rgba(191, 0, 255, 0.3), 
+                rgba(255, 0, 255, 0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cyber-card:hover .card-glow {
+            opacity: 1;
+        }
+
+        .card-inner {
+            padding: 35px;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-icon-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cyber-card:hover .card-icon::before {
+            left: 100%;
+        }
+
+        .card-icon.cyan {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.05));
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+
+        .card-icon.pink {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.05));
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            color: var(--neon-pink);
+        }
+
+        .card-icon.purple {
+            background: linear-gradient(135deg, rgba(191, 0, 255, 0.2), rgba(191, 0, 255, 0.05));
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 20px rgba(191, 0, 255, 0.3);
+            color: var(--neon-purple);
+        }
+
+        .card-icon.green {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.05));
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            color: var(--neon-green);
+        }
+
+        .card-index {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--neon-cyan);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .cyber-card:hover .card-title::after {
+            width: 80px;
+        }
+
+        .card-content {
+            flex: 1;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.9;
+            font-size: 1rem;
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .cyber-card:hover .stat-item {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .card-corner.top-left {
+            top: 15px;
+            left: 15px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .card-corner.top-right {
+            top: 15px;
+            right: 15px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .card-corner.bottom-left {
+            bottom: 15px;
+            left: 15px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .card-corner.bottom-right {
+            bottom: 15px;
+            right: 15px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .cyber-card:hover .card-corner {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(0, 255, 255, 0.1),
+                inset 0 0 30px rgba(0, 255, 255, 0.05);
+        }
+
+        .data-flow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--neon-cyan), transparent);
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        .cyber-card:hover .data-flow {
+            opacity: 0.6;
+            animation: dataFlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .card-number {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 3rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.03);
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-card:hover .card-number {
+            color: rgba(0, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .card-progress {
+            margin-top: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .progress-track {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 2px;
+            position: relative;
+            transition: width 1s ease;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-bar.cyan {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .progress-bar.pink {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .progress-bar.purple {
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        /* ==================== 页脚 ==================== */
+        
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .footer-item span {
+            color: var(--neon-cyan);
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        
+        @media (max-width: 1024px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+            
+            .section-title h2::before,
+            .section-title h2::after {
+                width: 30px;
+            }
+            
+            .section-title h2::before {
+                left: -45px;
+            }
+            
+            .section-title h2::after {
+                right: -45px;
+            }
+            
+            .system-status {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .card-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.1rem;
+            }
+            
+            .card-inner {
+                padding: 25px;
+            }
+            
+            .cursor-trail {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+                letter-spacing: 3px;
+            }
+            
+            .title-line {
+                width: 50px;
+            }
+            
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景特效 -->
+    <div class="grid-background"></div>
+    <div class="code-rain" id="codeRain"></div>
+    <div class="holo-background"></div>
+    <div class="scanlines"></div>
+    <div class="particles" id="particles"></div>
+    
+    <!-- 鼠标光标拖尾 -->
+    <div class="cursor-trail" id="cursorTrail"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <h1 class="main-title">
+                <span class="inner">CYBERPUNK</span>
+                <span class="glitch-layer">CYBERPUNK</span>
+                <span class="glitch-layer">CYBERPUNK</span>
+            </h1>
+            <p class="subtitle">∞ 未来视界 · 数字革命 · 赛博空间 ∞</p>
+            
+            <div class="title-decoration">
+                <div class="title-line"></div>
+                <span class="title-icon">◈</span>
+                <div class="title-line"></div>
+            </div>
+
+            <div class="system-status">
+                <div class="status-item" onclick="showNotification('系统状态正常', 'success')">
+                    <div class="status-dot green"></div>
+                    <span class="status-text">系统在线</span>
+                </div>
+                <div class="status-item" onclick="showNotification('神经连接稳定', 'success')">
+                    <div class="status-dot cyan"></div>
+                    <span class="status-text">神经连接</span>
+                </div>
+                <div class="status-item" onclick="showNotification('网络加密已激活', 'success')">
+                    <div class="status-dot pink"></div>
+                    <span class="status-text">网络加密</span>
+                </div>
+            </div>
+
+            <div class="data-loader">
+                <div class="loader-label">
+                    <span>LOADING DATA STREAM</span>
+                    <span id="loadPercent">0%</span>
+                </div>
+                <div class="loader-bar">
+                    <div class="loader-fill" id="loaderFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 交互式终端 -->
+        <section class="terminal-section">
+            <div class="section-title">
+                <h2>交互式终端</h2>
+            </div>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-title">◉ CYBERPUNK TERMINAL v2.0</span>
+                    <div class="terminal-buttons">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                    </div>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                    <div class="terminal-line success">欢迎使用赛博朋克终端系统 v2.0</div>
+                    <div class="terminal-line output">输入 'help' 查看可用命令</div>
+                    <div class="terminal-line input">user@cyber:~$ <span id="inputText"></span><span class="cursor">█</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 黑客入侵小游戏 -->
+        <section class="hacking-section">
+            <div class="section-title">
+                <h2>黑客入侵挑战</h2>
+            </div>
+            
+            <div class="hacking-game">
+                <div class="game-header">
+                    <span class="game-title">⚡ HACKING INTERFACE</span>
+                    <div class="game-stats">
+                        <div class="game-stat">
+                            <div class="game-stat-value" id="hackAttempts">5</div>
+                            <div class="game-stat-label">ATTEMPTS</div>
+                        </div>
+                        <div class="game-stat">
+                            <div class="game-stat-value" id="hackTime">30</div>
+                            <div class="game-stat-label">SECONDS</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-area">
+                    <div class="hacking-progress">
+                        <div class="hack-node active" data-index="1">1</div>
+                        <div class="hack-node" data-index="2">2</div>
+                        <div class="hack-node" data-index="3">3</div>
+                        <div class="hack-node" data-index="4">4</div>
+                        <div class="hack-node" data-index="5">5</div>
+                    </div>
+                    
+                    <div class="hack-display">
+                        <div class="hack-code" id="hackCode">----</div>
+                        <div class="hack-hint" id="hackHint">点击按钮开始破解</div>
+                    </div>
+                    
+                    <button class="hack-btn" id="hackBtn" onclick="startHack()">开始入侵</button>
+                    
+                    <div class="game-message" id="gameMessage"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成就系统 -->
+        <section class="achievements-section">
+            <div class="section-title">
+                <h2>成就系统</h2>
+            </div>
+            
+            <div class="achievements-grid">
+                <div class="achievement unlocked" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">🌐</div>
+                    <div class="achievement-name">初次连接</div>
+                    <div class="achievement-desc">访问网站</div>
+                    <span class="achievement-lock" style="display: none;">🔒</span>
+                </div>
+                
+                <div class="achievement" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">💻</div>
+                    <div class="achievement-name">终端专家</div>
+                    <div class="achievement-desc">使用终端命令</div>
+                    <span class="achievement-lock">🔒</span>
+                </div>
+                
+                <div class="achievement" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">👾</div>
+                    <div class="achievement-name">黑客入侵</div>
+                    <div class="achievement-desc">完成入侵游戏</div>
+                    <span class="achievement-lock">🔒</span>
+                </div>
+                
+                <div class="achievement" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">🎨</div>
+                    <div class="achievement-name">风格大师</div>
+                    <div class="achievement-desc">更换主题颜色</div>
+                    <span class="achievement-lock">🔒</span>
+                </div>
+                
+                <div class="achievement" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">🎵</div>
+                    <div class="achievement-name">音乐爱好者</div>
+                    <div class="achievement-desc">播放音乐</div>
+                    <span class="achievement-lock">🔒</span>
+                </div>
+                
+                <div class="achievement" onclick="unlockAchievement(this)">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-name">互动达人</div>
+                    <div class="achievement-desc">点击10个互动元素</div>
+                    <span class="achievement-lock">🔒</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 霓虹主题选择器 -->
+        <section class="theme-section">
+            <div class="section-title">
+                <h2>霓虹主题</h2>
+            </div>
+            
+            <div class="theme-selector">
+                <div class="theme-btn cyan active" data-name="青色" data-color="cyan" onclick="changeTheme('cyan')"></div>
+                <div class="theme-btn pink" data-name="粉色" data-color="pink" onclick="changeTheme('pink')"></div>
+                <div class="theme-btn green" data-name="绿色" data-color="green" onclick="changeTheme('green')"></div>
+                <div class="theme-btn purple" data-name="紫色" data-color="purple" onclick="changeTheme('purple')"></div>
+                <div class="theme-btn orange" data-name="橙色" data-color="orange" onclick="changeTheme('orange')"></div>
+            </div>
+        </section>
+
+        <!-- 音乐播放器 -->
+        <section class="music-section">
+            <div class="section-title">
+                <h2>赛博音乐</h2>
+            </div>
+            
+            <div class="music-player">
+                <div class="music-visualizer" id="musicVisualizer">
+                    <div class="viz-bar" style="animation-delay: 0s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.1s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.2s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.3s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.4s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.5s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.4s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.3s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.2s;"></div>
+                    <div class="viz-bar" style="animation-delay: 0.1s;"></div>
+                </div>
+                
+                <div class="music-info">
+                    <div class="music-title">赛博朋克夜之城</div>
+                    <div class="music-artist">System Operations</div>
+                </div>
+                
+                <div class="music-controls">
+                    <button class="music-btn" onclick="skipMusic('prev')">⏮</button>
+                    <button class="music-btn play" id="playBtn" onclick="toggleMusic()">▶</button>
+                    <button class="music-btn" onclick="skipMusic('next')">⏭</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 视频区域 -->
+        <section class="video-section">
+            <div class="section-title">
+                <h2>沉浸式体验</h2>
+            </div>
+            
+            <div class="video-wrapper-outer">
+                <div class="video-frame">
+                    <div class="video-aspect">
+                        <iframe 
+                            width="560" 
+                            height="315" 
+                            src="https://www.youtube.com/embed/T-8nKe81Od0?si=KeoIVk_D809YL-RI" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 信息卡片区域 -->
+        <section class="cards-section">
+            <div class="section-title">
+                <h2>系统模块</h2>
+            </div>
+            
+            <div class="cards-grid">
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">01</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon cyan">◉</div>
+                            <div>
+                                <div class="card-index">MODULE 01</div>
+                                <h3 class="card-title">数字神经系统</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            在赛博朋克的世界中，人类与科技的界限已经模糊。神经植入物让我们能够直接连接网络，获取无限的信息和能力。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">99.9%</div>
+                                <div class="stat-label">同步率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">0.01ms</div>
+                                <div class="stat-label">响应延迟</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">∞</div>
+                                <div class="stat-label">带宽容量</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>SYSTEM INTEGRITY</span>
+                                <span>98%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar cyan" style="width: 98%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">02</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon pink">⬡</div>
+                            <div>
+                                <div class="card-index">MODULE 02</div>
+                                <h3 class="card-title">霓虹都市</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            夜之城闪烁着无尽的霓虹灯光，高楼林立，广告全息投影覆盖天空。在这里，财富与贫困并存，科技与犯罪交织。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">8M+</div>
+                                <div class="stat-label">人口数</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">247</div>
+                                <div class="stat-label">活跃区域</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">∞</div>
+                                <div class="stat-label">霓虹灯数</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>CITY ACTIVITY</span>
+                                <span>87%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar pink" style="width: 87%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">03</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon purple">⬢</div>
+                            <div>
+                                <div class="card-index">MODULE 03</div>
+                                <h3 class="card-title">义体改造</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            身体可以被升级，意识可以被增强。在这个世界里，你的外形由你自己定义。赛博义肢不仅是工具，更是个人风格的象征。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">100+</div>
+                                <div class="stat-label">可升级部位</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">5000+</div>
+                                <div class="stat-label">定制选项</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">99.9%</div>
+                                <div class="stat-label">兼容性</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>UPGRADE READY</span>
+                                <span>92%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar purple" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">04</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon green">◈</div>
+                            <div>
+                                <div class="card-index">MODULE 04</div>
+                                <h3 class="card-title">虚拟现实</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            突破物理世界的限制，进入无限的数字宇宙。VR不再是娱乐，而是生活的延伸。真实与虚拟的边界已经消失。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">8K</div>
+                                <div class="stat-label">分辨率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">120Hz</div>
+                                <div class="stat-label">刷新率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label">沉浸感</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>VR READY</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar cyan" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">05</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon cyan">⚡</div>
+                            <div>
+                                <div class="card-index">MODULE 05</div>
+                                <h3 class="card-title">人工智能</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            AI已经发展出自我意识，成为社会的重要组成部分。它们是工具，是伙伴，也是潜在的威胁。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">Q-9000</div>
+                                <div class="stat-label">AI等级</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">10B</div>
+                                <div class="stat-label">参数规模</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label">学习能力</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>AI STATUS</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar pink" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="cyber-card">
+                    <div class="card-glow"></div>
+                    <div class="card-header"></div>
+                    <div class="data-flow"></div>
+                    <div class="card-corner top-left"></div>
+                    <div class="card-corner top-right"></div>
+                    <div class="card-corner bottom-left"></div>
+                    <div class="card-corner bottom-right"></div>
+                    <div class="card-number">06</div>
+                    
+                    <div class="card-inner">
+                        <div class="card-icon-area">
+                            <div class="card-icon purple">☮</div>
+                            <div>
+                                <div class="card-index">MODULE 06</div>
+                                <h3 class="card-title">黑客帝国</h3>
+                            </div>
+                        </div>
+                        
+                        <p class="card-content">
+                            在网络空间，信息就是力量。黑客们穿行于防火墙之间，窃取数据，操控系统，挑战权威。
+                        </p>
+                        
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">S+</div>
+                                <div class="stat-label">危险等级</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">∞</div>
+                                <div class="stat-label">破解能力</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label">隐藏率</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-progress">
+                            <div class="progress-header">
+                                <span>HACKING SKILL</span>
+                                <span>89%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar purple" style="width: 89%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer>
+            <div class="footer-logo">CYBERPUNK // SYSTEM</div>
+            <div class="footer-info">
+                <div class="footer-item">
+                    <span>◉</span> 系统版本: v3.0.2077
+                </div>
+                <div class="footer-item">
+                    <span>⚡</span> 运行时间: 99.9% uptime
+                </div>
+                <div class="footer-item">
+                    <span>◈</span> 加密状态: ACTIVE
+                </div>
+            </div>
+            <p class="copyright">© 2077 NIGHT CITY ENTERTAINMENT SYSTEM // ALL RIGHTS RESERVED</p>
+        </footer>
+    </div>
+
+    <!-- 通知弹窗 -->
+    <div id="notification" style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: rgba(0, 0, 0, 0.9);
+        border: 2px solid var(--neon-cyan);
+        border-radius: 5px;
+        color: var(--neon-cyan);
+        font-family: 'Courier New', monospace;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    "></div>
+
+    <script>
+        // ==================== 全局变量 ====================
+        let currentTheme = 'cyan';
+        let musicPlaying = false;
+        let musicInterval = null;
+        let clickCount = 0;
+        let terminalHistory = [];
+        let currentHackLevel = 1;
+        let hackAttempts = 5;
+        let hackTimer = null;
+        let hackTimeLeft = 30;
+        let hackInProgress = false;
+        let achievementsUnlocked = new Set();
+
+        // ==================== 初始化 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            createCodeRain();
+            animateLoader();
+            initCursorTrail();
+            initTerminal();
+            generateHackCode();
+            updateAchievements();
+        });
+
+        // ==================== 粒子效果 ====================
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 60;
+            const colors = ['#00ffff', '#ff00ff', '#bf00ff', '#00ff88'];
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.boxShadow = `0 0 6px ${colors[Math.floor(Math.random() * colors.length)]}`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // ==================== 代码雨效果 ====================
+        function createCodeRain() {
+            const codeRain = document.getElementById('codeRain');
+            const codeChars = '01';
+            const columns = Math.floor(window.innerWidth / 20);
+
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.classList.add('code-column');
+                column.style.left = i * 20 + 'px';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 5 + 's';
+                
+                let code = '';
+                for (let j = 0; j < 50; j++) {
+                    code += codeChars[Math.floor(Math.random() * codeChars.length)] + ' ';
+                }
+                column.textContent = code;
+                codeRain.appendChild(column);
+            }
+        }
+
+        // ==================== 加载进度条 ====================
+        function animateLoader() {
+            const loaderFill = document.getElementById('loaderFill');
+            const loadPercent = document.getElementById('loadPercent');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                loaderFill.style.width = progress + '%';
+                loadPercent.textContent = Math.round(progress) + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadPercent.textContent = 'COMPLETED';
+                        loadPercent.style.color = '#00ff88';
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // ==================== 鼠标光标拖尾 ====================
+        function initCursorTrail() {
+            const trail = document.getElementById('cursorTrail');
+            const dot = document.getElementById('cursorDot');
+            let mouseX = 0, mouseY = 0;
+            let trailX = 0, trailY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                dot.style.left = mouseX + 'px';
+                dot.style.top = mouseY + 'px';
+                
+                setTimeout(() => {
+                    trailX = mouseX;
+                    trailY = mouseY;
+                    trail.style.left = trailX + 'px';
+                    trail.style.top = trailY + 'px';
+                }, 50);
+
+                // 统计点击次数用于成就
+                clickCount++;
+                if (clickCount >= 10) {
+                    unlockAchievementByName('互动达人');
+                }
+            });
+
+            // 悬停时放大光标
+            document.querySelectorAll('button, .status-item, .achievement').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    trail.classList.add('active');
+                });
+                el.addEventListener('mouseleave', () => {
+                    trail.classList.remove('active');
+                });
+            });
+        }
+
+        // ==================== 交互式终端 ====================
+        function initTerminal() {
+            const terminal = document.getElementById('terminalBody');
+            const commands = {
+                'help': {
+                    response: '可用命令: help, clear, date, whoami, system, hack, theme, music, matrix, hacktest',
+                    type: 'output'
+                },
+                'clear': {
+                    response: '',
+                    type: 'clear'
+                },
+                'date': {
+                    response: new Date().toString(),
+                    type: 'output'
+                },
+                'whoami': {
+                    response: 'user@cyberpunk-system-v3',
+                    type: 'output'
+                },
+                'system': {
+                    response: '系统状态: 在线\nCPU: 99%\n内存: 8472MB\n网络: 已加密\n版本: v3.0.2077',
+                    type: 'output'
+                },
+                'hack': {
+                    response: '⚠️ 警告: 入侵检测系统已激活。前往"黑客入侵挑战"区域开始游戏。',
+                    type: 'success'
+                },
+                'theme': {
+                    response: '主题已切换。使用页面上的颜色选择器更改霓虹主题。',
+                    type: 'success'
+                },
+                'music': {
+                    response: '♪ 音乐播放器已就绪。点击播放按钮开始播放。',
+                    type: 'success'
+                },
+                'matrix': {
+                    response: '.matrix下载中...\n下载完成! 正在启动代码雨...',
+                    type: 'success'
+                },
+                'hacktest': {
+                    response: '🔐 测试版黑客工具 v1.0\n输入正确代码: 你的测试通过了!',
+                    type: 'success'
+                }
+            };
+
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+
+                if (e.key === 'Enter') {
+                    const inputLine = terminal.querySelector('.terminal-line.input');
+                    const command = terminalHistory[terminalHistory.length - 1] || '';
+                    
+                    if (command.trim()) {
+                        processCommand(command, commands, terminal);
+                        unlockAchievementByName('终端专家');
+                    }
+                } else if (e.key === 'Backspace') {
+                    terminalHistory.pop();
+                    updateTerminalInput(terminal);
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    autocompleteCommand(terminal, commands);
+                } else if (e.key.length === 1) {
+                    terminalHistory.push(e.key);
+                    updateTerminalInput(terminal);
+                }
+            });
+        }
+
+        function updateTerminalInput(terminal) {
+            const inputText = document.getElementById('inputText');
+            inputText.textContent = terminalHistory.join('');
+        }
+
+        function autocompleteCommand(terminal, commands) {
+            const currentInput = terminalHistory.join('');
+            const matchingCommands = Object.keys(commands).filter(cmd => 
+                cmd.startsWith(currentInput)
+            );
+            
+            if (matchingCommands.length === 1) {
+                terminalHistory = matchingCommands[0].split('');
+                updateTerminalInput(terminal);
+            }
+        }
+
+        function processCommand(command, commands, terminal) {
+            const cmd = command.toLowerCase().trim();
+            let result = commands[cmd];
+
+            if (!result) {
+                result = {
+                    response: `命令 '${cmd}' 未找到。输入 'help' 查看可用命令。`,
+                    type: 'error'
+                };
+            }
+
+            // 添加命令到终端历史
+            const inputLine = terminal.querySelector('.terminal-line.input');
+            const newInputLine = inputLine.cloneNode(true);
+            newInputLine.innerHTML = `user@cyber:~$ ${command}`;
+            inputLine.parentNode.insertBefore(newInputLine, inputLine);
+
+            if (result.type === 'clear') {
+                terminal.innerHTML = '';
+            } else {
+                // 添加输出
+                const outputLine = document.createElement('div');
+                outputLine.className = `terminal-line ${result.type}`;
+                outputLine.textContent = result.response;
+                terminal.insertBefore(outputLine, inputLine);
+            }
+
+            // 清空输入历史
+            terminalHistory = [];
+            updateTerminalInput(terminal);
+
+            // 滚动到底部
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // ==================== 黑客入侵小游戏 ====================
+        function generateHackCode() {
+            const codeElement = document.getElementById('hackCode');
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += Math.floor(Math.random() * 10);
+            }
+            codeElement.textContent = code.split('').join(' ');
+        }
+
+        function startHack() {
+            if (hackInProgress) return;
+            
+            hackInProgress = true;
+            currentHackLevel = 1;
+            hackAttempts = 5;
+            hackTimeLeft = 30;
+            
+            updateHackUI();
+            generateHackCode();
+            document.getElementById('hackBtn').textContent = '破解中...';
+            document.getElementById('hackBtn').disabled = true;
+            
+            // 开始计时器
+            hackTimer = setInterval(() => {
+                hackTimeLeft--;
+                updateHackUI();
+                
+                if (hackTimeLeft <= 0) {
+                    endHack(false);
+                }
+            }, 1000);
+        }
+
+        function attemptHack() {
+            if (!hackInProgress) return;
+            
+            // 模拟破解逻辑 - 随机成功或失败
+            const success = Math.random() > 0.4;
+            
+            if (success) {
+                currentHackLevel++;
+                if (currentHackLevel > 5) {
+                    endHack(true);
+                    return;
+                }
+                generateHackCode();
+            } else {
+                hackAttempts--;
+                if (hackAttempts <= 0) {
+                    endHack(false);
+                    return;
+                }
+                showHackMessage('破解失败! 防火墙正在抵抗...', 'error');
+            }
+            
+            updateHackUI();
+        }
+
+        function endHack(won) {
+            clearInterval(hackTimer);
+            hackInProgress = false;
+            
+            if (won) {
+                showHackMessage('🎉 入侵成功! 系统已被攻破。', 'win');
+                unlockAchievementByName('黑客入侵');
+                resetHackUI();
+            } else {
+                showHackMessage('💀 入侵失败! 连接已断开。', 'lose');
+                setTimeout(resetHackUI, 2000);
+            }
+        }
+
+        function resetHackUI() {
+            document.getElementById('hackBtn').textContent = '开始入侵';
+            document.getElementById('hackBtn').disabled = false;
+            currentHackLevel = 1;
+            hackAttempts = 5;
+            hackTimeLeft = 30;
+            updateHackUI();
+        }
+
+        function updateHackUI() {
+            document.getElementById('hackAttempts').textContent = hackAttempts;
+            document.getElementById('hackTime').textContent = hackTimeLeft;
+            
+            // 更新节点状态
+            document.querySelectorAll('.hack-node').forEach((node, index) => {
+                node.classList.remove('active', 'completed', 'current');
+                if (index + 1 < currentHackLevel) {
+                    node.classList.add('completed');
+                } else if (index + 1 === currentHackLevel) {
+                    node.classList.add('current');
+                    node.onclick = () => {
+                        if (hackInProgress) attemptHack();
+                    };
+                }
+            });
+        }
+
+        function showHackMessage(message, type) {
+            const messageEl = document.getElementById('gameMessage');
+            messageEl.textContent = message;
+            messageEl.className = `game-message ${type}`;
+        }
+
+        // ==================== 音乐播放器 ====================
+        function toggleMusic() {
+            musicPlaying = !musicPlaying;
+            const btn = document.getElementById('playBtn');
+            const vizBars = document.querySelectorAll('.viz-bar');
+            
+            if (musicPlaying) {
+                btn.textContent = '⏸';
+                vizBars.forEach(bar => {
+                    bar.style.animationPlayState = 'running';
+                });
+                showNotification('♪ 音乐播放中...', 'success');
+                unlockAchievementByName('音乐爱好者');
+            } else {
+                btn.textContent = '▶';
+                vizBars.forEach(bar => {
+                    bar.style.animationPlayState = 'paused';
+                });
+                showNotification('⏸ 音乐已暂停', 'success');
+            }
+        }
+
+        function skipMusic(direction) {
+            showNotification(`${direction === 'next' ? '⏭ 下一曲' : '⏮ 上一曲'}`, 'success');
+            if (!musicPlaying) {
+                toggleMusic();
+            }
+        }
+
+        // ==================== 主题切换 ====================
+        function changeTheme(color) {
+            currentTheme = color;
+            
+            // 更新主题按钮状态
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.color === color) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // 更新CSS变量
+            const colors = {
+                cyan: { primary: '#00ffff', secondary: '#00ff88' },
+                pink: { primary: '#ff00ff', secondary: '#ff00aa' },
+                green: { primary: '#00ff88', secondary: '#00cc66' },
+                purple: { primary: '#bf00ff', secondary: '#9900cc' },
+                orange: { primary: '#ff6b35', secondary: '#cc5500' }
+            };
+
+            const theme = colors[color];
+            document.documentElement.style.setProperty('--neon-cyan', theme.primary);
+            document.documentElement.style.setProperty('--neon-green', theme.secondary);
+            
+            // 更新卡片主题
+            document.querySelectorAll('.card-icon, .progress-bar').forEach(el => {
+                if (el.classList.contains(color)) {
+                    el.style.borderColor = theme.primary;
+                    el.style.boxShadow = `0 0 20px ${theme.primary}40`;
+                }
+            });
+
+            showNotification(`✓ 主题已切换: ${color.toUpperCase()}`, 'success');
+            unlockAchievementByName('风格大师');
+        }
+
+        // ==================== 成就系统 ====================
+        function unlockAchievement(element) {
+            if (element.classList.contains('locked')) {
+                showNotification('🔒 该成就尚未解锁', 'error');
+                return;
+            }
+            
+            const name = element.querySelector('.achievement-name').textContent;
+            showNotification(`🏆 成就: ${name}`, 'success');
+        }
+
+        function unlockAchievementByName(name) {
+            if (achievementsUnlocked.has(name)) return;
+            
+            achievementsUnlocked.add(name);
+            
+            document.querySelectorAll('.achievement').forEach(achievement => {
+                if (achievement.querySelector('.achievement-name').textContent === name) {
+                    achievement.classList.remove('locked');
+                    achievement.classList.add('unlocked');
+                    achievement.querySelector('.achievement-lock').style.display = 'none';
+                    showNotification(`🏆 成就解锁: ${name}!`, 'success');
+                }
+            });
+        }
+
+        function updateAchievements() {
+            // 初始解锁"初次连接"成就
+            achievementsUnlocked.add('初次连接');
+            
+            document.querySelectorAll('.achievement').forEach(achievement => {
+                const name = achievement.querySelector('.achievement-name').textContent;
+                if (achievementsUnlocked.has(name)) {
+                    achievement.classList.remove('locked');
+                    achievement.classList.add('unlocked');
+                    achievement.querySelector('.achievement-lock').style.display = 'none';
+                }
+            });
+        }
+
+        // ==================== 通知系统 ====================
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.borderColor = type === 'success' ? '#00ffff' : '#ff3366';
+            notification.style.color = type === 'success' ? '#00ffff' : '#ff3366';
+            notification.style.boxShadow = `0 0 20px ${type === 'success' ? 'rgba(0, 255, 255, 0.3)' : 'rgba(255, 51, 102, 0.3)'}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // ==================== 滚动视差效果 ====================
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const grid = document.querySelector('.grid-background');
+            const holo = document.querySelector('.holo-background');
+            
+            if (grid) {
+                grid.style.transform = `perspective(500px) rotateX(60deg) translateY(${scrolled * 0.05}px)`;
+            }
+            
+            if (holo) {
+                holo.style.transform = `translateY(${scrolled * 0.1}px)`;
+            }
+        });
+
+        // ==================== 键盘音效模拟 ====================
+        const keySounds = ['click', 'beep', 'ping', 'zap'];
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                const sound = keySounds[Math.floor(Math.random() * keySounds.length)];
+                // 可以在这里添加实际的音效
+            }
+        });
+    </script>
+</body>
+</html>
